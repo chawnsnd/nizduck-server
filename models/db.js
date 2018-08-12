@@ -18,3 +18,5 @@ db.on('error', err => {
 db.once('open', () => {
     console.info('mongodb connected successfully');
 })
+
+module.exports = db;

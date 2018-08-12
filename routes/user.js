@@ -1,4 +1,8 @@
 var express = require('express');
+var crypto = require('crypto');
+var db = require('../models/db');
+require('../models/user');
+var User = db.model('User');
 var router = express.Router();
 
 router.get('/me', (req, res, next)=>{
@@ -25,12 +29,60 @@ router.post('/', (req, res, next) => {
         sex: req.body.sex,
         bias: req.body.bias,
         interest: req.body.interest,
+        promotion: req.body.promotion,
         status: 'GENERAL'
     });
-    newUser.save((err) => {
+    newUser.save(err => {
+        console.log(err)
         if(err) return res.json({success: false, messagage: '회원가입에 문제가 발생했습니다.'});
         return res.json({success: true, message: '회원가입이 성공했습니다.'});
     })
+})
+
+router.post('/verify', (req, res, next) => {
+    var email = req.body.email;
+    var duckname = req.body.duckname;
+
+    if(!email && !duckname) return res.json({success: false, messagage: '파라미터를 입력하세요.'});
+    if(req.body.email){
+        if(!/^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i.test(email)){
+            return res.json({
+				success: false,
+				message: '이메일 형식을 확인하세요.'
+			});
+        } else {
+            User.findOne({email: email}, (err, user) => {
+                if(err) return next(err);
+                if(user) {
+                    return res.json({
+                        success: false,
+                        message: '이미 사용중인 이메일입니다.'
+                    });
+                } else {
+                    return res.json({
+                        success: true,
+                        message: '사용할 수 있습니다.'
+                    });
+                }
+            })
+        }
+    }
+    if(req.body.duckname){
+        User.findOne({duckname: duckname}, (err, user) => {
+            if(err) return next(err);
+            if(user) {
+                return res.json({
+                    success: false,
+                    message: '이미 사용중인 이메일입니다.'
+                });
+            } else {
+                return res.json({
+                    success: true,
+                    message: '사용할 수 있습니다.'
+                });
+            }
+        })
+    }
 })
 
 module.exports = router;
