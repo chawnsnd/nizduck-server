@@ -6,12 +6,6 @@ require('../models/user');
 var User = db.model('User');
 var router = express.Router();
 
-//내정보 불러오기
-router.get('/me', (req, res, next)=>{
-    if(!req.user) return res.json({success: false})
-    res.json({success: true, me: req.user})
-})
-
 //회원가입
 router.post('/', (req, res, next) => {
     if(!req.body.email) return res.json({success: false, message: '`email`는 필수 파라미터 입니다.'});
@@ -36,7 +30,6 @@ router.post('/', (req, res, next) => {
         status: 'GENERAL'
     });
     newUser.save(err => {
-        console.log(err)
         if(err) return res.json({success: false, messagage: '회원가입에 문제가 발생했습니다.'});
         return res.json({success: true, message: '회원가입이 성공했습니다.'});
     })
@@ -91,35 +84,31 @@ router.post('/verify', (req, res, next) => {
 
 //로그인
 router.post('/login', (req, res, next) => {
+    if(!req.body.email||!req.body.password) return res.json({success: false, message: '이메일 또는 비밀번호를 입력하세요.'});
 	User.findOne({email: req.body.email}, (err, user) => {
-		if(err) return next(err);
-		if(!user) return res.json({success: false, message: '아이디를 찾을 수 없습니다.'});
-
+        if(err) return next(err);
 		const hash = crypto.pbkdf2Sync(req.body.password, user.salt, 8192, 24, 'sha256').toString('base64');
-		if(hash != user.password) return res.json({success: false, message: '비밀번호가 일치하지 않습니다.'});
-
-		if(user.status == 'GENERAL' || user.status == 'ADMIN') {
-			jwt.sign({
-				user_id: user._id
-			}, req.app.get('jwt-secret'), {
-				expiresIn: '1y',
-				issuer: 'nizduck.com',
-				subject: 'user_id'
-			}, (err, token) => {
+		if(!user || hash != user.password) return res.json({success: false, message: '이메일 또는 비밀번호를 찾을 수 없습니다.'});
+		if(user.status === 'GENERAL') {
+            jwt.sign({user_id: user._id}, 
+                req.app.get('jwt-secret'), 
+                (err, token) => {
 				if(req.body.keep) {
 					res.cookie('token', token, {httpOnly: true, expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30 * 12)});
 				} else {
 					res.cookie('token', token, {httpOnly: true});
 				}
-				return res.json({success: true, token});
+				return res.json({success: true, user, token});
 			});
-		} else if(user.status == 'DENIED') {
-			return res.json({});
-		} else if(user.status == 'WAITING') {
-			return res.json({});
-		} else if(user.status == 'LEAVE') {
-			return res.json({});
+		} else {
+			return res.json({success: false, message: '일반사용자가 아닙니다.'});
 		}
 	});
 });
+
+//로그아웃
+router.post('/logout', (req, res, next) => {
+    res.cookie('token', '', {httpOnly: true});
+	res.json({success: true});
+})
 module.exports = router;

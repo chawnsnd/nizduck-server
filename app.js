@@ -16,6 +16,8 @@ var user = require('./routes/user');
 
 var app = express();
 
+app.set('jwt-secret', 'temp');
+
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
