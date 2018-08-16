@@ -13,6 +13,7 @@ var feed = require('./routes/feed');
 var board = require('./routes/board');
 var calendar = require('./routes/calendar');
 var user = require('./routes/user');
+var artist = require('./routes/artist');
 
 var app = express();
 
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
 // app.use('/board', board);
 // app.use('/calendar', calendar);
 app.use('/user', user);
+app.use('/artist', artist);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
