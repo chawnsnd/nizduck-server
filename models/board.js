@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var moment = require('moment');
+moment.locale('ko');
 
 var boardSchema = new Schema({
     title: { type: String, required: true},
@@ -15,19 +17,19 @@ var boardSchema = new Schema({
     view_count: { type: Number, defualt: 0},
     ip: { type: String, required: false },
     status: {type: String, default: "PUBLIC", uppercase: true},
-    vote: [voteSchema],
-    blame: [blameSchema],
-    comments: [commentSchema]
+    // votes: [voteSchema],
+    // blames: [blameSchema],
+    // comments: [commentSchema]
 });
 
 var voteSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    reg_date: { type: Date, defualt: Date.now}
+    reg_date: { type: Date, defualt: Date.now }
 });
 
 var blameSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    reg_date: { type: Date, defualt: Date.now}
+    reg_date: { type: Date, defualt: Date.now }
 });
 
 var commentSchema = new Schema({

@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var moment = require('moment');
+moment.locale('ko');
 
 var ArtistSchema = new Schema({
     ko_name: {type: String, required: true},

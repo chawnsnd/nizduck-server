@@ -30,11 +30,21 @@ router.get('/list', (req, res, next) => {
     var query = {};
     query.kind = req.query.kind;
     query.ko_name = req.query.search
-    Artist.find({$and: [{kind: query.kind}, {ko_name: /query.ko_name/}, {status: 'GENERAL'}]})
+    Artist.find({$and: [query, {status: 'GENERAL'}]})
     .lean()
     .exec((err, artists)=>{
         if(err) return res.json({success: false, messagage: '아티스트 조회에 문제가 발생했습니다.'});
         res.json({success: true, list: artists})
+    })
+})
+
+//아티스트 정보가져오기
+router.get('/:artist', (req, res, next) => {
+    var en_name = req.params.artist;
+    Artist.findOne({en_name: en_name})
+    .exec((err, artist) => {
+        if(err) return res.json({success: false, messagage: '아티스트 조회에 문제가 발생했습니다.'});
+        res.json({success: true, artist: artist})
     })
 })
 

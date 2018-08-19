@@ -50,10 +50,10 @@ app.use((req, res, next) => {
 })
 
 // app.use('/feed', feed);
-// app.use('/board', board);
 // app.use('/calendar', calendar);
 app.use('/user', user);
 app.use('/artist', artist);
+app.use('/board', board);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
