@@ -6,9 +6,6 @@ moment.locale('ko');
 var boardSchema = new Schema({
     title: { type: String, required: true},
     author: { type: Schema.Types.ObjectId, ref: 'User'},
-    author_name: { type: String, required: true},
-    author_profile: {type: String},
-    anonymous: { type: Boolean},
     notice: { type: Boolean},
     content: { type: String, required: true},
     reg_date: { type: Date, default: Date.now},

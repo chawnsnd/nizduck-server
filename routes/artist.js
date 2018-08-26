@@ -4,6 +4,15 @@ require('../models/artist');
 var Artist = db.model('Artist');
 var router = express.Router();
 
+//아티스트 정보가져오기
+router.get('/', (req, res, next) => {
+    var en_name = req.query.en_name
+    Artist.findOne({en_name: en_name}, (err, artist) => {
+        if(err) return res.json({success: false, message: '아티스트 조회에 문제가 발생했습니다.'});
+        res.json({success: true, artist: artist})
+    })
+})
+
 //아티스트 등록
 router.post('/', (req, res, next) => {
     if(!req.body.ko_name) return res.json({success: false, message: '`ko_name`는 필수 파라미터 입니다.'});
@@ -38,14 +47,5 @@ router.get('/list', (req, res, next) => {
     })
 })
 
-//아티스트 정보가져오기
-router.get('/:artist', (req, res, next) => {
-    var en_name = req.params.artist;
-    Artist.findOne({en_name: en_name})
-    .exec((err, artist) => {
-        if(err) return res.json({success: false, messagage: '아티스트 조회에 문제가 발생했습니다.'});
-        res.json({success: true, artist: artist})
-    })
-})
 
 module.exports = router;
