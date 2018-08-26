@@ -25,6 +25,22 @@ router.post('/', (req, res, next) => {
     })
 })
 
+//글 수정
+router.put('/:artist/:bno', (req, res, next) => {
+    console.log(req.body)
+	if(!req.body.password) return res.json({success: false, message: '`password`는 필수 파라미터 입니다.'});
+    if(!req.body.title) return res.json({success: false, message: '`title`는 필수 파라미터 입니다.'});
+    if(!req.body.content) return res.json({success: false, message: '`content`는 필수 파라미터 입니다.'});
+
+    var modifyBoard = req.body;
+
+    Board.findOneAndUpdate({_id: modifyBoard._id}, modifyBoard, (err, item) => {
+        if(err) next(err);
+        if(!item) return next(new Error('Unknown Item'));
+        res.json({success: true, Item: modifyBoard});
+    });
+})
+
 //글검색
 router.get('/:artist/:bno', (req, res, next) => {
     var artist = req.params.artist;
@@ -41,7 +57,6 @@ router.get('/:artist', (req, res, next) => {
     Board.find({$and: [{artist: artist}, {status: 'GENERAL'}]})
     .lean()
     .exec((err, list) => {
-        console.log(list)
         if(err) return res.json({success: false, message: '보드 리스트 검색이 실패했습니다.'});
         res.json({success: true, list: list})
     })
